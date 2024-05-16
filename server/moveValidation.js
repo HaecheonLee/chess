@@ -247,6 +247,7 @@ function canEnPassant(from, to, piece) {
 
     return (
         lastMove &&
+        lastMove.piece.toLowerCase() === "p" &&
         lastMove.piece !== piece &&
         Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
         Math.abs(lastMove.to.col - from.col) === 1 &&
