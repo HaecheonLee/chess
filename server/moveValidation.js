@@ -160,15 +160,7 @@ function validatePawnMove(board, from, to, piece, targetPiece) {
     }
 
     // En passant
-    if (
-        lastMove &&
-        lastMove.piece.toLowerCase() !== piece &&
-        Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
-        Math.abs(lastMove.to.col - from.col) === 1 &&
-        to.row === from.row + direction &&
-        to.col === lastMove.to.col &&
-        !targetPiece
-    ) {
+    if (canEnPassant(from, to, piece) && !targetPiece) {
         return true;
     }
 
@@ -229,17 +221,7 @@ function applyMove(board, from, to, piece) {
     newBoard[from.row][from.col] = "";
 
     // Handle en passant capture
-    const direction = piece === piece.toUpperCase() ? -1 : 1;
-    if (
-        lastMove &&
-        lastMove.piece.toLowerCase() === "p" &&
-        Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
-        Math.abs(lastMove.to.col - from.col) === 1 &&
-        Math.abs(from.col - to.col) === 1 &&
-        to.row === from.row + direction &&
-        from.col === lastMove.to.col
-    ) {
-        console.log("En passant...");
+    if (canEnPassant(from, to, piece)) {
         newBoard[lastMove.to.row][lastMove.to.col] = "";
     }
 
@@ -258,6 +240,20 @@ function getValidMoves(board, from) {
         }
     }
     return validMoves;
+}
+
+function canEnPassant(from, to, piece) {
+    const direction = piece === piece.toUpperCase() ? -1 : 1;
+
+    return (
+        lastMove &&
+        lastMove.piece !== piece &&
+        Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
+        Math.abs(lastMove.to.col - from.col) === 1 &&
+        lastMove.to.row === from.row &&
+        to.row === from.row + direction &&
+        to.col === lastMove.to.col
+    );
 }
 
 module.exports = {
