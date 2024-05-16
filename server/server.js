@@ -8,7 +8,6 @@ const {
     getValidMoves,
     isCheckmate,
 } = require("./moveValidation");
-const { initializeBoard } = require("./gameLogic");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +16,16 @@ const io = socketIo(server);
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-let board = initializeBoard();
+let board = [
+    ["r", "n", "b", "q", "k", "b", "n", "r"],
+    ["p", "p", "p", "p", "p", "p", "p", "p"],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["P", "P", "P", "P", "P", "P", "P", "P"],
+    ["R", "N", "B", "Q", "K", "B", "N", "R"],
+];
 let currentTurn = "white"; // 'white' or 'black'
 let whiteSocket = null;
 let blackSocket = null;
