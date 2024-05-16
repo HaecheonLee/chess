@@ -52,6 +52,10 @@ io.on("connection", (socket) => {
         const piece = board[from.row][from.col];
         const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
 
+        if (to.row == null || to.col == null) {
+            return; // Only when "to" contains valid row and col
+        }
+
         if (
             (pieceColor === "white" && socket !== whiteSocket) ||
             (pieceColor === "black" && socket !== blackSocket)
