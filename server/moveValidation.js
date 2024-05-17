@@ -24,27 +24,14 @@ function validateMove(board, from, to) {
     newBoard[from.row][from.col] = "";
 
     // Check if the move leaves the king in check
-    if (isKingInCheck(newBoard, pieceColor)) {
+    if (
+        isKingInCheck(newBoard, pieceColor) &&
+        !clearsCheck(board, from, to, pieceColor)
+    ) {
         return false;
     }
 
-    // Validate move based on piece type
-    switch (piece.toLowerCase()) {
-        case "p":
-            return validatePawnMove(board, from, to, piece, targetPiece);
-        case "r":
-            return validateRookMove(board, from, to, piece, targetPiece);
-        case "n":
-            return validateKnightMove(board, from, to, piece, targetPiece);
-        case "b":
-            return validateBishopMove(board, from, to, piece, targetPiece);
-        case "q":
-            return validateQueenMove(board, from, to, piece, targetPiece);
-        case "k":
-            return validateKingMove(board, from, to, piece, targetPiece);
-        default:
-            return false;
-    }
+    return canMove(board, from, to);
 }
 
 function isCheckmate(board, kingColor) {
@@ -96,7 +83,7 @@ function isKingInCheck(board, kingColor) {
                     opponentColor
             ) {
                 const from = { row, col };
-                if (validateMove(board, from, kingPosition)) {
+                if (canMove(board, from, kingPosition)) {
                     return true;
                 }
             }
@@ -255,6 +242,37 @@ function canEnPassant(from, to, piece) {
         to.row === from.row + direction &&
         to.col === lastMove.to.col
     );
+}
+
+function clearsCheck(board, from, to, kingColor) {
+    const newBoard = JSON.parse(JSON.stringify(board));
+    newBoard[to.row][to.col] = newBoard[from.row][from.col];
+    newBoard[from.row][from.col] = "";
+
+    return !isKingInCheck(newBoard, kingColor);
+}
+
+function canMove(board, from, to) {
+    const piece = board[from.row][from.col];
+    const targetPiece = board[to.row][to.col];
+
+    // Validate move based on piece type
+    switch (piece.toLowerCase()) {
+        case "p": // Pawn
+            return validatePawnMove(board, from, to, piece, targetPiece);
+        case "r": // Rook
+            return validateRookMove(board, from, to, piece, targetPiece);
+        case "n": // Knight
+            return validateKnightMove(board, from, to, piece, targetPiece);
+        case "b": // Bishop
+            return validateBishopMove(board, from, to, piece, targetPiece);
+        case "q": // Queen
+            return validateQueenMove(board, from, to, piece, targetPiece);
+        case "k": // King
+            return validateKingMove(board, from, to, piece, targetPiece);
+        default:
+            return false;
+    }
 }
 
 module.exports = {
