@@ -1,4 +1,5 @@
 let lastMove = null;
+let movedPieces = {};
 
 function validateMove(board, from, to) {
     const piece = board[from.row][from.col];
@@ -31,7 +32,68 @@ function validateMove(board, from, to) {
         return false;
     }
 
+    // Check if the move is a valid castling move
+    if (piece.toLowerCase() === "k" && Math.abs(from.col - to.col) === 2) {
+        return validateCastling(board, from, to, pieceColor);
+    }
+
     return canMove(board, from, to);
+}
+
+function validateCastling(board, from, to, kingColor) {
+    const row = from.row;
+    const kingStartCol = 4;
+    const rookStartCol = to.col > kingStartCol ? 7 : 0;
+    const step = to.col > kingStartCol ? 1 : -1;
+
+    if (row !== to.row) {
+        return false;
+    }
+
+    if (
+        movedPieces[`${kingColor}K`] ||
+        movedPieces[`${kingColor}R${rookStartCol}`]
+    ) {
+        return false;
+    }
+
+    for (let col = kingStartCol + step; col !== to.col; col += step) {
+        if (
+            board[row][col] !== "" ||
+            isSquareAttacked(board, { row, col }, kingColor)
+        ) {
+            return false;
+        }
+    }
+
+    if (
+        isSquareAttacked(board, { row, kingStartCol }, kingColor) ||
+        isSquareAttacked(board, to, kingColor)
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+function isSquareAttacked(board, square, color) {
+    const opponentColor = color === "white" ? "black" : "white";
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            const piece = board[row][col];
+            if (
+                piece &&
+                (piece === piece.toUpperCase() ? "white" : "black") ===
+                    opponentColor
+            ) {
+                const from = { row, col };
+                if (canMove(board, from, square)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 function isCheckmate(board, kingColor) {
@@ -213,6 +275,19 @@ function applyMove(board, from, to, piece) {
     }
 
     lastMove = { piece, from, to };
+
+    // Handle castling
+    if (piece.toLowerCase() === "k" && Math.abs(from.col - to.col) === 2) {
+        const rookCol = to.col > from.col ? 7 : 0;
+        const newRookCol = to.col > from.col ? to.col - 1 : to.col + 1;
+        newBoard[from.row][newRookCol] = newBoard[from.row][rookCol];
+        newBoard[from.row][rookCol] = "";
+    }
+
+    // Track moved pieces
+    const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
+    movedPieces[`${pieceColor}${piece}`] = true;
+
     return newBoard;
 }
 
