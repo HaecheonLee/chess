@@ -133,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         socket.emit("move", { from: selectedPiece, to });
         clearHighlights();
-        selectedPiece = null;
     }
 
     function highlightValidMoves(from) {
@@ -162,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         board = newBoard;
         currentTurn = newTurn;
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
+        selectedPiece = null;
         updateMoveHistory(moveHistory);
         createBoard();
     });
