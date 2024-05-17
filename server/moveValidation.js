@@ -1,7 +1,7 @@
 let lastMove = null;
 let movedPieces = {};
 
-function validateMove(board, from, to) {
+function validateMove(board, from, to, promotion = null) {
     const piece = board[from.row][from.col];
     if (!piece) return false;
 
@@ -37,7 +37,7 @@ function validateMove(board, from, to) {
         return validateCastling(board, from, to, pieceColor);
     }
 
-    return canMove(board, from, to);
+    return canMove(board, from, to, promotion);
 }
 
 function validateCastling(board, from, to, kingColor) {
@@ -167,7 +167,7 @@ function findKing(board, kingColor) {
     return null;
 }
 
-function validatePawnMove(board, from, to, piece, targetPiece) {
+function validatePawnMove(board, from, to, piece, targetPiece, promotion) {
     const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const targetPieceColor = targetPiece
         ? targetPiece === targetPiece.toUpperCase()
@@ -210,6 +210,12 @@ function validatePawnMove(board, from, to, piece, targetPiece) {
 
     // En passant
     if (canEnPassant(from, to, piece) && !targetPiece) {
+        return true;
+    }
+
+    // Promotion
+    const promotionRow = pieceColor === "white" ? 0 : 7;
+    if (to.row === promotionRow && promotion) {
         return true;
     }
 
@@ -264,9 +270,19 @@ function validateKingMove(board, from, to, piece, targetPiece) {
     return rowDiff <= 1 && colDiff <= 1;
 }
 
-function applyMove(board, from, to, piece) {
+function applyMove(board, from, to, piece, promotion = null) {
+    const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const newBoard = board.map((row) => row.slice());
-    newBoard[to.row][to.col] = newBoard[from.row][from.col];
+
+    // Handle promotion
+    if (promotion) {
+        newBoard[to.row][to.col] =
+            pieceColor === "white"
+                ? promotion.toUpperCase()
+                : promotion.toLowerCase();
+    } else {
+        newBoard[to.row][to.col] = newBoard[from.row][from.col];
+    }
     newBoard[from.row][from.col] = "";
 
     // Handle en passant capture
@@ -285,7 +301,6 @@ function applyMove(board, from, to, piece) {
     }
 
     // Track moved pieces
-    const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     movedPieces[`${pieceColor}${piece}`] = true;
 
     return newBoard;
@@ -327,14 +342,21 @@ function clearsCheck(board, from, to, kingColor) {
     return !isKingInCheck(newBoard, kingColor);
 }
 
-function canMove(board, from, to) {
+function canMove(board, from, to, promotion) {
     const piece = board[from.row][from.col];
     const targetPiece = board[to.row][to.col];
 
     // Validate move based on piece type
     switch (piece.toLowerCase()) {
         case "p": // Pawn
-            return validatePawnMove(board, from, to, piece, targetPiece);
+            return validatePawnMove(
+                board,
+                from,
+                to,
+                piece,
+                targetPiece,
+                promotion
+            );
         case "r": // Rook
             return validateRookMove(board, from, to, piece, targetPiece);
         case "n": // Knight

@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
     }
 
     socket.on("move", (data) => {
-        const { from, to } = data;
+        const { from, to, promotion } = data;
         const piece = board[from.row][from.col];
         const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
 
@@ -67,8 +67,8 @@ io.on("connection", (socket) => {
             return; // It's not this player's turn
         }
 
-        if (validateMove(board, from, to)) {
-            board = applyMove(board, from, to, piece);
+        if (validateMove(board, from, to, promotion)) {
+            board = applyMove(board, from, to, piece, promotion);
             currentTurn = currentTurn === "white" ? "black" : "white"; // Switch turns
             const moveNotation = `${piece}${String.fromCharCode(
                 97 + from.col

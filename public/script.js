@@ -107,7 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
             col: parseInt(event.target.dataset.col, 10),
         };
 
-        socket.emit("move", { from, to });
+        // Check for promotion
+        const piece = board[from.row][from.col];
+        const promotion = promptPromotion(piece, to.row);
+
+        socket.emit("move", { from, to, promotion });
     }
 
     function onPieceClick(event) {
@@ -127,12 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function onSquareClick(event) {
         if (!selectedPiece) return;
 
-        const to = {
-            row: parseInt(event.target.dataset.row, 10),
-            col: parseInt(event.target.dataset.col, 10),
-        };
-        socket.emit("move", { from: selectedPiece, to });
-        clearHighlights();
+        const row = parseInt(event.target.dataset.row);
+        const col = parseInt(event.target.dataset.col);
+
+        const from = selectedPiece;
+        const to = { row, col };
+
+        // Check for promotion
+        const piece = board[from.row][from.col];
+        const promotion = promptPromotion(piece, to.row);
+
+        socket.emit("move", { from, to, promotion });
     }
 
     function highlightValidMoves(from) {
@@ -154,6 +163,23 @@ document.addEventListener("DOMContentLoaded", () => {
         highlightedSquares.forEach((square) => {
             square.classList.remove("highlight");
         });
+    }
+
+    function promptPromotion(piece, row) {
+        const promotion =
+            (piece === "P" && row === 0) || (piece === "p" && row === 7)
+                ? prompt("Promote to (q/r/b/n):", "q")
+                : undefined;
+
+        if (promotion === undefined) {
+            return null;
+        }
+
+        const newPiece = promotion === null ? "q" : promotion;
+
+        return piece === piece.toUpperCase()
+            ? newPiece.toUpperCase()
+            : newPiece.toLowerCase();
     }
 
     socket.on("move", (data) => {
