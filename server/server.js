@@ -75,16 +75,15 @@ io.on("connection", (socket) => {
             )}${8 - from.row}-${String.fromCharCode(97 + to.col)}${8 - to.row}`;
             moveHistory.push(moveNotation);
 
-            // Check for checkmate
-            if (
-                isCheckmate(board, currentTurn === "white" ? "black" : "white")
-            ) {
-                io.emit("gameOver", { winner: currentTurn });
-            } else {
-                io.emit("move", {
-                    currentTurn,
-                    moveHistory,
-                    newBoard: JSON.parse(JSON.stringify(board)),
+            io.emit("move", {
+                currentTurn,
+                moveHistory,
+                newBoard: JSON.parse(JSON.stringify(board)),
+            });
+
+            if (isCheckmate(board, currentTurn)) {
+                io.emit("gameOver", {
+                    winner: currentTurn === "white" ? "black" : "white",
                 });
             }
         }

@@ -185,6 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
         turnIndicator.textContent = "You are a spectator";
     });
 
+    socket.on("gameOver", (data) => {
+        const { winner } = data;
+        turnIndicator.textContent = `Game over! ${winner} wins!`;
+    });
+
     turnIndicator.textContent = `Current Turn: ${currentTurn}`;
     createBoard();
 });
