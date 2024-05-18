@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function addPointerToValidMoves(from) {
-        clearPointers();
+        clearSquares();
         socket.emit("getValidMoves", from, (validMoves) => {
             validMoves.forEach((move) => {
                 const square = getSquareElement(move);
@@ -158,26 +158,43 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function clearPointers() {
-        const squaresWithPointers = document.querySelectorAll(".pointer");
-        squaresWithPointers.forEach((square) => {
-            square.classList.remove("pointer");
-            square.classList.remove("corners");
+    function clearSquares() {
+        const squares = document.querySelectorAll(".pointer, .corners");
+        squares.forEach((square) => {
+            square.classList.remove("pointer", "corners");
         });
     }
 
-    function highlightMove(from, to) {
-        const squares = [getSquareElement(from), getSquareElement(to)];
-        squares.forEach((square) => {
+    function highlightSquares(from, to, kingPosition) {
+        const squares = [
+            {
+                square: getSquareElement(from),
+                className: "highlight",
+            },
+            {
+                square: getSquareElement(to),
+                className: "highlight",
+            },
+            {
+                square: getSquareElement(kingPosition),
+                className: "checked",
+            },
+        ];
+
+        squares.forEach(({ square, className }) => {
             if (square) {
-                square.classList.add("highlight");
+                square.classList.add(className);
             }
         });
     }
 
-    function getSquareElement(move) {
+    function getSquareElement(position) {
+        if (!position) {
+            return null;
+        }
+
         return document.querySelector(
-            `.square[data-row='${move.row}'][data-col='${move.col}']`
+            `.square[data-row='${position.row}'][data-col='${position.col}']`
         );
     }
 
@@ -199,14 +216,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     socket.on("move", (data) => {
-        const { currentTurn: newTurn, moveHistory, from, to, newBoard } = data;
+        const {
+            currentTurn: newTurn,
+            moveHistory,
+            from,
+            to,
+            kingPosition,
+            newBoard,
+        } = data;
         board = newBoard;
         currentTurn = newTurn;
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
         selectedPiece = null;
         updateMoveHistory(moveHistory);
         createBoard();
-        highlightMove(from, to);
+        highlightSquares(from, to, kingPosition);
     });
 
     socket.on("boardState", (data) => {

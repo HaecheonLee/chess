@@ -82,7 +82,14 @@ io.on("connection", (socket) => {
         }
 
         if (validateMove(board, from, to, promotion)) {
-            board = applyMove(board, from, to, piece, promotion);
+            const { newBoard, kingPosition } = applyMove(
+                board,
+                from,
+                to,
+                piece,
+                promotion
+            );
+            board = newBoard;
             currentTurn = currentTurn === "white" ? "black" : "white"; // Switch turns
             const moveNotation = `${pieces[piece]}${String.fromCharCode(
                 97 + from.col
@@ -94,6 +101,7 @@ io.on("connection", (socket) => {
                 moveHistory,
                 from,
                 to,
+                kingPosition,
                 newBoard: JSON.parse(JSON.stringify(board)),
             });
 

@@ -303,7 +303,16 @@ function applyMove(board, from, to, piece, promotion = null) {
     // Track moved pieces
     movedPieces[`${pieceColor}${piece}`] = true;
 
-    return newBoard;
+    // Return the opponent king's position when it is in check
+    const opponentColor = pieceColor === "white" ? "black" : "white";
+    if (isKingInCheck(newBoard, opponentColor)) {
+        return {
+            newBoard,
+            kingPosition: findKing(newBoard, opponentColor),
+        };
+    }
+
+    return { newBoard };
 }
 
 function getValidMoves(board, from) {
