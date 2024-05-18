@@ -148,9 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearPointers();
         socket.emit("getValidMoves", from, (validMoves) => {
             validMoves.forEach((move) => {
-                const square = document.querySelector(
-                    `.square[data-row='${move.row}'][data-col='${move.col}']`
-                );
+                const square = getSquareElement(move);
                 if (square) {
                     square.classList.add("pointer");
                 }
@@ -163,6 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
         squaresWithPointers.forEach((square) => {
             square.classList.remove("pointer");
         });
+    }
+
+    function highlightMove(from, to) {
+        const squares = [getSquareElement(from), getSquareElement(to)];
+        squares.forEach((square) => {
+            console.log(from, to, square);
+            if (square) {
+                square.classList.add("highlight");
+            }
+        });
+    }
+
+    function getSquareElement(move) {
+        return document.querySelector(
+            `.square[data-row='${move.row}'][data-col='${move.col}']`
+        );
     }
 
     function promptPromotion(piece, row) {
@@ -183,13 +197,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     socket.on("move", (data) => {
-        const { currentTurn: newTurn, moveHistory, newBoard } = data;
+        const { currentTurn: newTurn, moveHistory, from, to, newBoard } = data;
         board = newBoard;
         currentTurn = newTurn;
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
         selectedPiece = null;
         updateMoveHistory(moveHistory);
         createBoard();
+        highlightMove(from, to);
     });
 
     socket.on("boardState", (data) => {

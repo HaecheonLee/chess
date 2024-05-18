@@ -92,6 +92,8 @@ io.on("connection", (socket) => {
             io.emit("move", {
                 currentTurn,
                 moveHistory,
+                from,
+                to,
                 newBoard: JSON.parse(JSON.stringify(board)),
             });
 
