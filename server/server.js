@@ -16,6 +16,20 @@ const io = socketIo(server);
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
 
+const pieces = {
+    r: "♜",
+    n: "♞",
+    b: "♝",
+    q: "♛",
+    k: "♚",
+    p: "♟",
+    R: "♖",
+    N: "♘",
+    B: "♗",
+    Q: "♕",
+    K: "♔",
+    P: "♙",
+};
 let board = [
     ["r", "n", "b", "q", "k", "b", "n", "r"],
     ["p", "p", "p", "p", "p", "p", "p", "p"],
@@ -70,7 +84,7 @@ io.on("connection", (socket) => {
         if (validateMove(board, from, to, promotion)) {
             board = applyMove(board, from, to, piece, promotion);
             currentTurn = currentTurn === "white" ? "black" : "white"; // Switch turns
-            const moveNotation = `${piece}${String.fromCharCode(
+            const moveNotation = `${pieces[piece]}${String.fromCharCode(
                 97 + from.col
             )}${8 - from.row}-${String.fromCharCode(97 + to.col)}${8 - to.row}`;
             moveHistory.push(moveNotation);
