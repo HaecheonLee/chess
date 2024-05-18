@@ -225,6 +225,20 @@ document.addEventListener("DOMContentLoaded", () => {
             : newPiece.toLowerCase();
     }
 
+    function updateStatus(user, on) {
+        const statusDot = document.querySelector(`.status #${user} .dot`);
+
+        if (!statusDot) {
+            return;
+        }
+
+        if (on) {
+            statusDot.classList.add("assigned");
+        } else {
+            statusDot.classList.remove("assigned");
+        }
+    }
+
     socket.on("move", (data) => {
         const {
             currentTurn: newTurn,
@@ -251,11 +265,12 @@ document.addEventListener("DOMContentLoaded", () => {
         updateMoveHistory(moveHistory);
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
         createBoard();
+        updateStatus(data.white, true);
+        updateStatus(data.black, true);
     });
 
     socket.on("assignedSide", (side) => {
         playerSide = side;
-        turnIndicator.textContent = `You are playing as: ${playerSide}`;
         createBoard(); // Re-create the board to adjust piece positions
     });
 
@@ -267,5 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("gameOver", (data) => {
         const { winner } = data;
         turnIndicator.textContent = `Game over! ${winner} wins!`;
+    });
+
+    socket.on("attach", (data) => {
+        updateStatus(data.white, true);
+        updateStatus(data.black, true);
+    });
+
+    socket.on("detach", (data) => {
+        updateStatus(data.user, false);
     });
 });

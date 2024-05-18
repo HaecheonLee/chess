@@ -49,7 +49,11 @@ io.on("connection", (socket) => {
     console.log("a user connected");
 
     // Send the current board state, turn, and move history to the new user
-    socket.emit("boardState", { board, currentTurn, moveHistory });
+    socket.emit("boardState", {
+        board,
+        currentTurn,
+        moveHistory,
+    });
 
     if (!whiteSocket) {
         whiteSocket = socket;
@@ -60,6 +64,11 @@ io.on("connection", (socket) => {
     } else {
         socket.emit("spectator");
     }
+
+    io.emit("attach", {
+        white: whiteSocket == null ? null : "white",
+        black: blackSocket == null ? null : "black",
+    });
 
     socket.on("move", (data) => {
         const { from, to, promotion } = data;
@@ -138,8 +147,10 @@ io.on("connection", (socket) => {
         console.log("user disconnected");
         if (socket === whiteSocket) {
             whiteSocket = null;
+            io.emit("detach", { user: "white" });
         } else if (socket === blackSocket) {
             blackSocket = null;
+            io.emit("detach", { user: "black" });
         }
     });
 });

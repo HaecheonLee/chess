@@ -12,8 +12,22 @@
             <div id="chessboard"></div>
         </div>
         <div>
-            <div><span>History</span></div>
-            <div id="move-history"></div>
+            <div>
+                <div class="status">
+                    <div id="white" class="status--indicator">
+                        <span>White</span>
+                        <span class="dot"></span>
+                    </div>
+                    <div id="black" class="status--indicator">
+                        <span>Black</span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div><span>History</span></div>
+                <div id="move-history"></div>
+            </div>
         </div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="script.js"></script>

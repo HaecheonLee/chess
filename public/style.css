@@ -121,10 +121,35 @@ body {
     display: flex;
     flex-direction: column;
     width: 200px;
-    height: 400px;
+    height: 360px;
     overflow-y: auto;
     background-color: #fff;
     border: 1px solid #ccc;
     padding: 10px;
     box-sizing: border-box;
+}
+
+.status {
+    height: 40px;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    .status--indicator {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #808080;
+        display: inline-block;
+
+        &.assigned {
+            background-color: #9acd32;
+        }
+    }
 }
