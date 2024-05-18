@@ -94,7 +94,7 @@ io.on("connection", (socket) => {
             const moveNotation = `${pieces[piece]}${String.fromCharCode(
                 97 + from.col
             )}${8 - from.row}-${String.fromCharCode(97 + to.col)}${8 - to.row}`;
-            moveHistory.push(moveNotation);
+            moveHistory.push({ moveNotation, from, to });
 
             io.emit("move", {
                 currentTurn,

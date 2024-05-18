@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentTurn = "white"; // 'white' or 'black'
     let playerSide = null; // 'white' or 'black' or 'spectator'
     let selectedPiece = null;
+    let moveHistory = [];
 
     function createBoard() {
         chessboard.innerHTML = "";
@@ -70,13 +71,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 chessboard.appendChild(square);
             }
         }
+
+        const latestMoveHistory = moveHistory[moveHistory.length - 1];
+        if (latestMoveHistory) {
+            highlightSquares(
+                latestMoveHistory.from,
+                latestMoveHistory.to,
+                null
+            );
+        }
     }
 
     function updateMoveHistory(history) {
         moveHistoryElement.innerHTML = "";
-        history.forEach((move, index) => {
+        history.forEach(({ moveNotation }, index) => {
             const moveElement = document.createElement("div");
-            moveElement.textContent = `${index + 1}. ${move}`;
+            moveElement.textContent = `${index + 1}. ${moveNotation}`;
             moveHistoryElement.appendChild(moveElement);
         });
     }
@@ -218,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("move", (data) => {
         const {
             currentTurn: newTurn,
-            moveHistory,
+            moveHistory: history,
             from,
             to,
             kingPosition,
@@ -226,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } = data;
         board = newBoard;
         currentTurn = newTurn;
+        moveHistory = history;
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
         selectedPiece = null;
         updateMoveHistory(moveHistory);
@@ -236,7 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("boardState", (data) => {
         board = data.board;
         currentTurn = data.currentTurn;
-        updateMoveHistory(data.moveHistory);
+        moveHistory = data.moveHistory;
+        updateMoveHistory(moveHistory);
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
         createBoard();
     });
@@ -256,7 +268,4 @@ document.addEventListener("DOMContentLoaded", () => {
         const { winner } = data;
         turnIndicator.textContent = `Game over! ${winner} wins!`;
     });
-
-    turnIndicator.textContent = `Current Turn: ${currentTurn}`;
-    createBoard();
 });
