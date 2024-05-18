@@ -1,43 +1,47 @@
 body {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
-}
-
-#chessboard {
-    display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
-    margin-right: 20px;
-    transform: rotate(0deg); /* Default rotation */
-}
-
-#chessboard.black {
-    transform: rotate(360deg); /* Rotate board for black player */
 }
 
 .square {
     width: 50px;
     height: 50px;
     position: relative;
-}
 
-.square.black {
-    background-color: #769656;
-}
+    &.black {
+        background-color: #769656;
+    }
 
-.square.white {
-    background-color: #eeeed2;
+    &.white {
+        background-color: #eeeed2;
+    }
+
+    &.pointer {
+        &::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            border-radius: 100%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.25);
+            z-index: 1;
+        }
+    }
 }
 
 .piece {
     font-size: 32px;
     text-align: center;
     line-height: 50px;
-    cursor: grab;
+    cursor: pointer;
     position: absolute;
     top: 0;
     left: 0;
@@ -46,13 +50,22 @@ body {
     transform: rotate(0deg); /* Default rotation */
 }
 
-#chessboard.black .piece {
-    transform: rotate(360deg); /* Rotate pieces for black player */
-}
-
 .highlight {
     background-color: rgba(255, 255, 0, 0.5) !important;
-    cursor: pointer;
+}
+
+#chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+    margin-right: 20px;
+    transform: rotate(0deg); /* Default rotation */
+
+    &.black {
+        .piece {
+            transform: rotate(360deg); /* Rotate board for black player */
+        }
+    }
 }
 
 #move-history {
@@ -64,4 +77,5 @@ body {
     background-color: #fff;
     border: 1px solid #ccc;
     padding: 10px;
+    box-sizing: border-box;
 }

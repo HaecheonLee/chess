@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         selectedPiece = { row, col };
-        highlightValidMoves(selectedPiece);
+        addPointerToValidMoves(selectedPiece);
     }
 
     function onSquareClick(event) {
@@ -144,24 +144,24 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.emit("move", { from, to, promotion });
     }
 
-    function highlightValidMoves(from) {
-        clearHighlights();
+    function addPointerToValidMoves(from) {
+        clearPointers();
         socket.emit("getValidMoves", from, (validMoves) => {
             validMoves.forEach((move) => {
                 const square = document.querySelector(
                     `.square[data-row='${move.row}'][data-col='${move.col}']`
                 );
                 if (square) {
-                    square.classList.add("highlight");
+                    square.classList.add("pointer");
                 }
             });
         });
     }
 
-    function clearHighlights() {
-        const highlightedSquares = document.querySelectorAll(".highlight");
-        highlightedSquares.forEach((square) => {
-            square.classList.remove("highlight");
+    function clearPointers() {
+        const squaresWithPointers = document.querySelectorAll(".pointer");
+        squaresWithPointers.forEach((square) => {
+            square.classList.remove("pointer");
         });
     }
 
