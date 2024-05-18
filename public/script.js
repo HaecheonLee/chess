@@ -169,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function highlightMove(from, to) {
         const squares = [getSquareElement(from), getSquareElement(to)];
         squares.forEach((square) => {
-            console.log(from, to, square);
             if (square) {
                 square.classList.add("highlight");
             }
