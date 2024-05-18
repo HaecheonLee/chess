@@ -150,7 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
             validMoves.forEach((move) => {
                 const square = getSquareElement(move);
                 if (square) {
-                    square.classList.add("pointer");
+                    square.classList.add(
+                        square.hasChildNodes() ? "corners" : "pointer"
+                    );
                 }
             });
         });
@@ -160,6 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const squaresWithPointers = document.querySelectorAll(".pointer");
         squaresWithPointers.forEach((square) => {
             square.classList.remove("pointer");
+            square.classList.remove("corners");
         });
     }
 
