@@ -1,22 +1,23 @@
-const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
-const path = require("path");
-const {
+import { Board, IMoveHistory, PieceColor, Piece } from "../types/types";
+import { Server, Socket } from "socket.io";
+import express from "express";
+import http from "http";
+import path from "path";
+import {
     validateMove,
     applyMove,
     getValidMoves,
     isCheckmate,
-} = require("./moveValidation");
+} from "./moveValidation";
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-const pieces = {
+const pieces: Record<Piece, string> = {
     r: "♜",
     n: "♞",
     b: "♝",
@@ -30,7 +31,7 @@ const pieces = {
     K: "♔",
     P: "♙",
 };
-let board = [
+let board: Board = [
     ["r", "n", "b", "q", "k", "b", "n", "r"],
     ["p", "p", "p", "p", "p", "p", "p", "p"],
     ["", "", "", "", "", "", "", ""],
@@ -40,10 +41,10 @@ let board = [
     ["P", "P", "P", "P", "P", "P", "P", "P"],
     ["R", "N", "B", "Q", "K", "B", "N", "R"],
 ];
-let currentTurn = "white"; // 'white' or 'black'
-let whiteSocket = null;
-let blackSocket = null;
-let moveHistory = [];
+let currentTurn: PieceColor = "white"; // 'white' or 'black'
+let whiteSocket: Socket | null = null;
+let blackSocket: Socket | null = null;
+let moveHistory: IMoveHistory[] = [];
 
 io.on("connection", (socket) => {
     console.log("a user connected");
@@ -88,6 +89,10 @@ io.on("connection", (socket) => {
 
         if (pieceColor !== currentTurn) {
             return; // It's not this player's turn
+        }
+
+        if (piece === "") {
+            return; // Piece is not valid
         }
 
         if (validateMove(board, from, to, promotion)) {

@@ -1,16 +1,23 @@
 {
-  "name": "chess",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
-  }
+    "name": "chess",
+    "version": "1.0.0",
+    "description": "A two-player chess game built with vanilla JavaScript and Node.js.",
+    "main": "dist/server/server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc",
+        "dev": "ts-node src/server/server.ts",
+        "start": "tsc && cp -r src/public dist/public && node dist/server/server.js"
+    },
+    "dependencies": {
+        "express": "^4.19.2",
+        "socket.io": "^4.7.5"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    },
+    "author": "",
+    "license": "MIT"
 }

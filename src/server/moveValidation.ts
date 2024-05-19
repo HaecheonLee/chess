@@ -1,7 +1,22 @@
-let lastMove = null;
-let movedPieces = {};
+import {
+    Board,
+    PieceColor,
+    IMovePiece,
+    ISquare,
+    Piece,
+    PromotionPiece,
+    BoardPiece,
+} from "../types/types";
 
-function validateMove(board, from, to, promotion = null) {
+let lastMove: IMovePiece | null = null;
+let movedPieces: Record<string, boolean> = {};
+
+function validateMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    promotion: PromotionPiece | null = null
+) {
     const piece = board[from.row][from.col];
     if (!piece) return false;
 
@@ -40,7 +55,12 @@ function validateMove(board, from, to, promotion = null) {
     return canMove(board, from, to, promotion);
 }
 
-function validateCastling(board, from, to, kingColor) {
+function validateCastling(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    kingColor: PieceColor
+) {
     const row = from.row;
     const kingStartCol = 4;
     const rookStartCol = to.col > kingStartCol ? 7 : 0;
@@ -67,7 +87,7 @@ function validateCastling(board, from, to, kingColor) {
     }
 
     if (
-        isSquareAttacked(board, { row, kingStartCol }, kingColor) ||
+        isSquareAttacked(board, { row, col: kingStartCol }, kingColor) ||
         isSquareAttacked(board, to, kingColor)
     ) {
         return false;
@@ -76,7 +96,7 @@ function validateCastling(board, from, to, kingColor) {
     return true;
 }
 
-function isSquareAttacked(board, square, color) {
+function isSquareAttacked(board: Board, square: ISquare, color: PieceColor) {
     const opponentColor = color === "white" ? "black" : "white";
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -86,7 +106,10 @@ function isSquareAttacked(board, square, color) {
                 (piece === piece.toUpperCase() ? "white" : "black") ===
                     opponentColor
             ) {
-                const from = { row, col };
+                const from = {
+                    row: row,
+                    col: col,
+                };
                 if (canMove(board, from, square)) {
                     return true;
                 }
@@ -96,7 +119,7 @@ function isSquareAttacked(board, square, color) {
     return false;
 }
 
-function isCheckmate(board, kingColor) {
+function isCheckmate(board: Board, kingColor: PieceColor) {
     if (!isKingInCheck(board, kingColor)) {
         return false;
     }
@@ -109,7 +132,7 @@ function isCheckmate(board, kingColor) {
                 (piece === piece.toUpperCase() ? "white" : "black") ===
                     kingColor
             ) {
-                const from = { row, col };
+                const from = { row: row, col: col };
                 for (let targetRow = 0; targetRow < 8; targetRow++) {
                     for (let targetCol = 0; targetCol < 8; targetCol++) {
                         const to = { row: targetRow, col: targetCol };
@@ -130,7 +153,7 @@ function isCheckmate(board, kingColor) {
     return true;
 }
 
-function isKingInCheck(board, kingColor) {
+function isKingInCheck(board: Board, kingColor: PieceColor) {
     const kingPosition = findKing(board, kingColor);
     if (!kingPosition) return false;
 
@@ -155,7 +178,7 @@ function isKingInCheck(board, kingColor) {
     return false;
 }
 
-function findKing(board, kingColor) {
+function findKing(board: Board, kingColor: PieceColor) {
     const king = kingColor === "white" ? "K" : "k";
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -167,7 +190,14 @@ function findKing(board, kingColor) {
     return null;
 }
 
-function validatePawnMove(board, from, to, piece, targetPiece, promotion) {
+function validatePawnMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece,
+    promotion: PromotionPiece | null
+) {
     const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const targetPieceColor = targetPiece
         ? targetPiece === targetPiece.toUpperCase()
@@ -222,7 +252,13 @@ function validatePawnMove(board, from, to, piece, targetPiece, promotion) {
     return false;
 }
 
-function validateRookMove(board, from, to, piece, targetPiece) {
+function validateRookMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece
+) {
     if (from.row !== to.row && from.col !== to.col) return false;
     if (from.row === to.row) {
         const direction = from.col < to.col ? 1 : -1;
@@ -238,13 +274,25 @@ function validateRookMove(board, from, to, piece, targetPiece) {
     return true;
 }
 
-function validateKnightMove(board, from, to, piece, targetPiece) {
+function validateKnightMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece
+) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
 }
 
-function validateBishopMove(board, from, to, piece, targetPiece) {
+function validateBishopMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece
+) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     if (rowDiff !== colDiff) return false;
@@ -257,36 +305,54 @@ function validateBishopMove(board, from, to, piece, targetPiece) {
     return true;
 }
 
-function validateQueenMove(board, from, to, piece, targetPiece) {
+function validateQueenMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece
+) {
     return (
         validateRookMove(board, from, to, piece, targetPiece) ||
         validateBishopMove(board, from, to, piece, targetPiece)
     );
 }
 
-function validateKingMove(board, from, to, piece, targetPiece) {
+function validateKingMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    targetPiece: BoardPiece
+) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     return rowDiff <= 1 && colDiff <= 1;
 }
 
-function applyMove(board, from, to, piece, promotion = null) {
+function applyMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    piece: Piece,
+    promotion: PromotionPiece | null = null
+) {
     const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const newBoard = board.map((row) => row.slice());
-
+    let x = newBoard[0][0];
     // Handle promotion
     if (promotion) {
         newBoard[to.row][to.col] =
             pieceColor === "white"
-                ? promotion.toUpperCase()
-                : promotion.toLowerCase();
+                ? (promotion.toUpperCase() as Uppercase<PromotionPiece>)
+                : (promotion.toLowerCase() as Lowercase<PromotionPiece>);
     } else {
         newBoard[to.row][to.col] = newBoard[from.row][from.col];
     }
     newBoard[from.row][from.col] = "";
 
     // Handle en passant capture
-    if (canEnPassant(from, to, piece)) {
+    if (lastMove && canEnPassant(from, to, piece)) {
         newBoard[lastMove.to.row][lastMove.to.col] = "";
     }
 
@@ -315,8 +381,8 @@ function applyMove(board, from, to, piece, promotion = null) {
     return { newBoard };
 }
 
-function getValidMoves(board, from) {
-    const validMoves = [];
+function getValidMoves(board: Board, from: ISquare): ISquare[] {
+    const validMoves: ISquare[] = [];
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             const to = { row, col };
@@ -328,7 +394,7 @@ function getValidMoves(board, from) {
     return validMoves;
 }
 
-function canEnPassant(from, to, piece) {
+function canEnPassant(from: ISquare, to: ISquare, piece: Piece) {
     const direction = piece === piece.toUpperCase() ? -1 : 1;
 
     return (
@@ -343,7 +409,12 @@ function canEnPassant(from, to, piece) {
     );
 }
 
-function clearsCheck(board, from, to, kingColor) {
+function clearsCheck(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    kingColor: PieceColor
+) {
     const newBoard = JSON.parse(JSON.stringify(board));
     newBoard[to.row][to.col] = newBoard[from.row][from.col];
     newBoard[from.row][from.col] = "";
@@ -351,9 +422,18 @@ function clearsCheck(board, from, to, kingColor) {
     return !isKingInCheck(newBoard, kingColor);
 }
 
-function canMove(board, from, to, promotion) {
+function canMove(
+    board: Board,
+    from: ISquare,
+    to: ISquare,
+    promotion: PromotionPiece | null = null
+) {
     const piece = board[from.row][from.col];
     const targetPiece = board[to.row][to.col];
+
+    if (piece === "") {
+        return false; // Piece is not valid to move
+    }
 
     // Validate move based on piece type
     switch (piece.toLowerCase()) {
@@ -381,9 +461,4 @@ function canMove(board, from, to, promotion) {
     }
 }
 
-module.exports = {
-    validateMove,
-    applyMove,
-    getValidMoves,
-    isCheckmate,
-};
+export { validateMove, applyMove, getValidMoves, isCheckmate };
