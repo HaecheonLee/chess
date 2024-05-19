@@ -160,9 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
             validMoves.forEach((move) => {
                 const square = getSquareElement(move);
                 if (square) {
-                    square.classList.add(
-                        square.hasChildNodes() ? "corners" : "pointer"
-                    );
+                    const hasPiece =
+                        square.firstChild?.classList.contains("piece");
+                    square.classList.add(hasPiece ? "corners" : "pointer");
                 }
             });
         });
