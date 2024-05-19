@@ -23,7 +23,7 @@ body {
     &.pointer {
         cursor: pointer;
 
-        &::before {
+        &::after {
             content: "";
             position: absolute;
             top: 50%;
