@@ -2,12 +2,13 @@
     "compilerOptions": {
         "target": "ES6",
         "module": "CommonJS",
-        "outDir": "./dist",
-        "rootDir": "./src",
+        "outDir": "./dist/server",
+        "rootDir": "./src/server",
+        "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "typeRoots": ["./types"]
     },
-    "include": ["src/**/*"],
+    "include": ["./src/server/**/*"],
     "exclude": ["node_modules", "dist"]
 }

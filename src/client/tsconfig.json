@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "NodeNext",
+        "rootDir": "./",
+        "skipLibCheck": true,
+        "typeRoots": ["../types", "../../node_modules"],
+        "types": ["vite/client"]
+    },
+    "include": ["*"],
+    "exclude": ["tsconfig.json"]
+}

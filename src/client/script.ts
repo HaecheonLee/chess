@@ -1,3 +1,5 @@
+import { io } from "socket.io-client";
+
 document.addEventListener("DOMContentLoaded", () => {
     const socket = io();
     const chessboard = document.getElementById("chessboard");
@@ -50,16 +52,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 square.className = `square ${
                     (i + j) % 2 === 0 ? "white" : "black"
                 }`;
-                square.dataset.row = row;
-                square.dataset.col = col;
+                square.dataset.row = String(row);
+                square.dataset.col = String(col);
 
                 if (board[row][col]) {
                     const piece = document.createElement("div");
                     piece.className = "piece";
                     piece.textContent = pieces[board[row][col]];
                     piece.draggable = true;
-                    piece.dataset.row = row;
-                    piece.dataset.col = col;
+                    piece.dataset.row = String(row);
+                    piece.dataset.col = String(col);
                     piece.addEventListener("dragstart", onDragStart);
                     piece.addEventListener("click", onPieceClick);
                     square.appendChild(piece);
