@@ -101,6 +101,9 @@ body {
     right: 0;
     bottom: 0;
     transform: rotate(0deg); /* Default rotation */
+
+    user-select: none; /* Standard syntax */
+    -webkit-user-select: none; /* For WebKit browsers (Chrome, Safari) */
 }
 
 #chessboard {
