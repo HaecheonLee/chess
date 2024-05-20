@@ -7,7 +7,7 @@
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "typeRoots": ["./types"]
+        "typeRoots": ["./src/types"]
     },
     "include": ["./src/server/**/*"],
     "exclude": ["node_modules", "dist"]
