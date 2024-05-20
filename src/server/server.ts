@@ -14,8 +14,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Serve static files from the 'client' directory
+app.use(express.static(path.join(__dirname, "../client")));
+
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "../../public")));
 
 const pieces: Record<Piece, string> = {
     r: "♜",
