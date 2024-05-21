@@ -5,6 +5,7 @@
         "outDir": "./dist/server",
         "rootDir": "./src/server",
         "strict": true,
+        "strictNullChecks": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "typeRoots": ["./src/types"]

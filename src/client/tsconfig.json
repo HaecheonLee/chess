@@ -3,6 +3,8 @@
         "target": "ES6",
         "module": "NodeNext",
         "rootDir": "./",
+        "strict": true,
+        "strictNullChecks": true,
         "skipLibCheck": true,
         "typeRoots": ["../types", "../../node_modules"],
         "types": ["vite/client"]

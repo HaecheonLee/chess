@@ -1,10 +1,17 @@
 import { io } from "socket.io-client";
+import {
+    BoardPiece,
+    IMoveHistory,
+    ISquare,
+    ISquareString,
+    UserRole,
+} from "../types/types";
 
 document.addEventListener("DOMContentLoaded", () => {
     const socket = io();
-    const chessboard = document.getElementById("chessboard");
-    const turnIndicator = document.getElementById("turn-indicator");
-    const moveHistoryElement = document.getElementById("move-history");
+    const chessboard = document.getElementById("chessboard")!;
+    const turnIndicator = document.getElementById("turn-indicator")!;
+    const moveHistoryElement = document.getElementById("move-history")!;
     const pieces = {
         r: "♜",
         n: "♞",
@@ -20,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         P: "♙",
     };
 
-    let board = [
+    let board: BoardPiece[][] = [
         ["r", "n", "b", "q", "k", "b", "n", "r"],
         ["p", "p", "p", "p", "p", "p", "p", "p"],
         ["", "", "", "", "", "", "", ""],
@@ -32,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let currentTurn = "white"; // 'white' or 'black'
-    let playerSide = null; // 'white' or 'black' or 'spectator'
-    let selectedPiece = null;
-    let moveHistory = [];
+    let playerSide: UserRole | null = null; // 'white' or 'black' or 'spectator'
+    let selectedPieceSquare: ISquare | null = null;
+    let moveHistory: IMoveHistory[] = [];
 
     function createBoard() {
         chessboard.innerHTML = "";
@@ -55,10 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 square.dataset.row = String(row);
                 square.dataset.col = String(col);
 
-                if (board[row][col]) {
+                const pieceOnBoard = board[row][col];
+                if (pieceOnBoard) {
                     const piece = document.createElement("div");
                     piece.className = "piece";
-                    piece.textContent = pieces[board[row][col]];
+                    piece.textContent = pieces[pieceOnBoard];
                     piece.draggable = true;
                     piece.dataset.row = String(row);
                     piece.dataset.col = String(col);
@@ -84,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function updateMoveHistory(history) {
+    function updateMoveHistory(history: IMoveHistory[]) {
         moveHistoryElement.innerHTML = "";
         history.forEach(({ moveNotation }, index) => {
             const moveElement = document.createElement("div");
@@ -93,7 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function onDragStart(event) {
+    function onDragStart(event: DragEvent) {
+        if (
+            !checkEventTarget(event.target) ||
+            !checkDataset(event.target.dataset) ||
+            event.dataTransfer == null
+        ) {
+            return;
+        }
+
         const row = parseInt(event.target.dataset.row, 10);
         const col = parseInt(event.target.dataset.col, 10);
         const piece = board[row][col];
@@ -107,12 +123,21 @@ document.addEventListener("DOMContentLoaded", () => {
         event.dataTransfer.setData("text/plain", JSON.stringify({ row, col }));
     }
 
-    function onDragOver(event) {
+    function onDragOver(event: DragEvent) {
         event.preventDefault();
     }
 
-    function onDrop(event) {
+    function onDrop(event: DragEvent) {
         event.preventDefault();
+
+        if (
+            !checkEventTarget(event.target) ||
+            !checkDataset(event.target.dataset) ||
+            event.dataTransfer == null
+        ) {
+            return;
+        }
+
         const from = JSON.parse(event.dataTransfer.getData("text/plain"));
         const to = {
             row: parseInt(event.target.dataset.row, 10),
@@ -126,7 +151,14 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.emit("move", { from, to, promotion });
     }
 
-    function onPieceClick(event) {
+    function onPieceClick(event: MouseEvent) {
+        if (
+            !checkEventTarget(event.target) ||
+            !checkDataset(event.target.dataset)
+        ) {
+            return;
+        }
+
         const row = parseInt(event.target.dataset.row, 10);
         const col = parseInt(event.target.dataset.col, 10);
         const piece = board[row][col];
@@ -136,17 +168,23 @@ document.addEventListener("DOMContentLoaded", () => {
             return; // Prevent selecting if it's not this player's turn
         }
 
-        selectedPiece = { row, col };
-        addPointerToValidMoves(selectedPiece);
+        selectedPieceSquare = { row, col };
+        addPointerToValidMoves(selectedPieceSquare);
     }
 
-    function onSquareClick(event) {
-        if (!selectedPiece) return;
+    function onSquareClick(event: MouseEvent) {
+        if (
+            !checkEventTarget(event.target) ||
+            !checkDataset(event.target.dataset) ||
+            !selectedPieceSquare
+        ) {
+            return;
+        }
 
         const row = parseInt(event.target.dataset.row);
         const col = parseInt(event.target.dataset.col);
 
-        const from = selectedPiece;
+        const from = selectedPieceSquare;
         const to = { row, col };
 
         // Check for promotion
@@ -156,9 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.emit("move", { from, to, promotion });
     }
 
-    function addPointerToValidMoves(from) {
+    function addPointerToValidMoves(from: ISquare) {
         clearSquares();
-        socket.emit("getValidMoves", from, (validMoves) => {
+        socket.emit("getValidMoves", from, (validMoves: ISquare[]) => {
             validMoves.forEach((move) => {
                 const square = getSquareElement(move);
                 if (square) {
@@ -177,7 +215,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function highlightSquares(from, to, kingPosition) {
+    function highlightSquares(
+        from: ISquare,
+        to: ISquare,
+        kingPosition: ISquare | null
+    ) {
         const squares = [
             {
                 square: getSquareElement(from),
@@ -200,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function getSquareElement(position) {
+    function getSquareElement(position: ISquare | null) {
         if (!position) {
             return null;
         }
@@ -210,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    function promptPromotion(piece, row) {
+    function promptPromotion(piece: BoardPiece, row: number) {
         const promotion =
             (piece === "P" && row === 0) || (piece === "p" && row === 7)
                 ? prompt("Promote to (q/r/b/n):", "q")
@@ -227,18 +269,43 @@ document.addEventListener("DOMContentLoaded", () => {
             : newPiece.toLowerCase();
     }
 
-    function updateStatus(user, on) {
+    function updateStatus(user: UserRole, isAssigned: boolean) {
         const statusDot = document.querySelector(`.status #${user} .dot`);
 
         if (!statusDot) {
             return;
         }
 
-        if (on) {
+        if (isAssigned) {
             statusDot.classList.add("assigned");
         } else {
             statusDot.classList.remove("assigned");
         }
+    }
+
+    /**
+     * Checks if the given event target is an HTML element.
+     * @param {EventTarget | null} target - The event target to check.
+     * @returns {target is HTMLElement} - Returns true if the target is an HTMLElement, otherwise false.
+     */
+    function checkEventTarget(
+        target: EventTarget | null
+    ): target is HTMLElement {
+        return target instanceof HTMLElement;
+    }
+
+    /**
+     * Checks if the given dataset contains the properties of ISquareString.
+     * @param {DOMStringMap} dataset - The dataset to check.
+     * @returns {dataset is DOMStringMap & ISquareString} - Returns true if the dataset contains the properties of ISquareString, otherwise false.
+     */
+    function checkDataset(
+        dataset: DOMStringMap
+    ): dataset is DOMStringMap & ISquareString {
+        return (
+            Object.prototype.hasOwnProperty.call(dataset, "row") &&
+            Object.prototype.hasOwnProperty.call(dataset, "col")
+        );
     }
 
     socket.on("move", (data) => {
@@ -254,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTurn = newTurn;
         moveHistory = history;
         turnIndicator.textContent = `Current Turn: ${currentTurn}`;
-        selectedPiece = null;
+        selectedPieceSquare = null;
         updateMoveHistory(moveHistory);
         createBoard();
         highlightSquares(from, to, kingPosition);
