@@ -48,6 +48,7 @@ let currentTurn: PieceColor = "white"; // 'white' or 'black'
 let whiteSocket: Socket | null = null;
 let blackSocket: Socket | null = null;
 let moveHistory: IMoveHistory[] = [];
+let isGameOver = false;
 
 io.on("connection", (socket) => {
     console.log("a user connected");
@@ -123,6 +124,7 @@ io.on("connection", (socket) => {
             });
 
             if (isCheckmate(board, currentTurn)) {
+                isGameOver = true;
                 io.emit("gameOver", {
                     winner: currentTurn === "white" ? "black" : "white",
                 });
@@ -160,6 +162,32 @@ io.on("connection", (socket) => {
             blackSocket = null;
             io.emit("detach", { user: "black" });
         }
+    });
+
+    socket.on("reset", () => {
+        if (!isGameOver) {
+            return;
+        }
+
+        board = [
+            ["r", "n", "b", "q", "k", "b", "n", "r"],
+            ["p", "p", "p", "p", "p", "p", "p", "p"],
+            ["", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", ""],
+            ["P", "P", "P", "P", "P", "P", "P", "P"],
+            ["R", "N", "B", "Q", "K", "B", "N", "R"],
+        ];
+        currentTurn = "white";
+        moveHistory = [];
+        isGameOver = false;
+
+        io.emit("boardState", {
+            board,
+            currentTurn,
+            moveHistory,
+        });
     });
 });
 

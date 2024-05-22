@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const chessboard = document.getElementById("chessboard")!;
     const turnIndicator = document.getElementById("turn-indicator")!;
     const moveHistoryElement = document.getElementById("move-history")!;
+    const resetButton = document.getElementById("reset-game")!;
+
+    // Set the initial state
     const pieces = {
         r: "♜",
         n: "♞",
@@ -38,10 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
         ["R", "N", "B", "Q", "K", "B", "N", "R"],
     ];
 
-    let currentTurn = "white"; // 'white' or 'black'
+    let currentTurn: UserRole = "white"; // 'white' or 'black'
     let playerSide: UserRole | null = null; // 'white' or 'black' or 'spectator'
     let selectedPieceSquare: ISquare | null = null;
     let moveHistory: IMoveHistory[] = [];
+
+    resetButton.addEventListener("click", () => socket.emit("reset"));
 
     function createBoard() {
         chessboard.innerHTML = "";
@@ -336,6 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
         createBoard();
         updateStatus(data.white, true);
         updateStatus(data.black, true);
+        resetButton.hidden = true;
     });
 
     socket.on("assignedSide", (side) => {
@@ -351,6 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("gameOver", (data) => {
         const { winner } = data;
         turnIndicator.textContent = `Game over! ${winner} wins!`;
+        resetButton.hidden = false;
     });
 
     socket.on("attach", (data) => {

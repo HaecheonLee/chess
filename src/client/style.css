@@ -106,32 +106,6 @@ body {
     -webkit-user-select: none; /* For WebKit browsers (Chrome, Safari) */
 }
 
-#chessboard {
-    display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
-    margin-right: 20px;
-    transform: rotate(0deg); /* Default rotation */
-
-    &.black {
-        .piece {
-            transform: rotate(360deg); /* Rotate board for black player */
-        }
-    }
-}
-
-#move-history {
-    display: flex;
-    flex-direction: column;
-    width: 200px;
-    height: 360px;
-    overflow-y: auto;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
 .status {
     height: 40px;
     text-transform: capitalize;
@@ -155,4 +129,38 @@ body {
             background-color: #9acd32;
         }
     }
+}
+
+.container {
+    margin-right: 20px;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #chessboard {
+        display: grid;
+        grid-template-columns: repeat(8, 50px);
+        grid-template-rows: repeat(8, 50px);
+        transform: rotate(0deg); /* Default rotation */
+
+        &.black {
+            .piece {
+                transform: rotate(360deg); /* Rotate board for black player */
+            }
+        }
+    }
+}
+
+#move-history {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 360px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
 }
