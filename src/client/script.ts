@@ -6,6 +6,7 @@ import {
     ISquareString,
     UserRole,
 } from "../types/types";
+import { initializeBoard, initializePieces } from "../common/initialState";
 
 document.addEventListener("DOMContentLoaded", () => {
     const socket = io();
@@ -15,31 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetButton = document.getElementById("reset-game")!;
 
     // Set the initial state
-    const pieces = {
-        r: "♜",
-        n: "♞",
-        b: "♝",
-        q: "♛",
-        k: "♚",
-        p: "♟",
-        R: "♖",
-        N: "♘",
-        B: "♗",
-        Q: "♕",
-        K: "♔",
-        P: "♙",
-    };
-
-    let board: BoardPiece[][] = [
-        ["r", "n", "b", "q", "k", "b", "n", "r"],
-        ["p", "p", "p", "p", "p", "p", "p", "p"],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["", "", "", "", "", "", "", ""],
-        ["P", "P", "P", "P", "P", "P", "P", "P"],
-        ["R", "N", "B", "Q", "K", "B", "N", "R"],
-    ];
+    const pieces = initializePieces();
+    let board = initializeBoard();
 
     let currentTurn: UserRole = "white"; // 'white' or 'black'
     let playerSide: UserRole | null = null; // 'white' or 'black' or 'spectator'

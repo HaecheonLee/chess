@@ -1,4 +1,6 @@
 import { Board, IMoveHistory, PieceColor, Piece } from "../types/types";
+import { initializeBoard, initializePieces } from "../common/initialState";
+
 import { Server, Socket } from "socket.io";
 import express from "express";
 import http from "http";
@@ -20,30 +22,8 @@ app.use(express.static(path.join(__dirname, "../client")));
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "../../public")));
 
-const pieces: Record<Piece, string> = {
-    r: "♜",
-    n: "♞",
-    b: "♝",
-    q: "♛",
-    k: "♚",
-    p: "♟",
-    R: "♖",
-    N: "♘",
-    B: "♗",
-    Q: "♕",
-    K: "♔",
-    P: "♙",
-};
-let board: Board = [
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", "p", "p", "p", "p", "p", "p", "p"],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["P", "P", "P", "P", "P", "P", "P", "P"],
-    ["R", "N", "B", "Q", "K", "B", "N", "R"],
-];
+const pieces = initializePieces();
+let board: Board = initializeBoard();
 let currentTurn: PieceColor = "white"; // 'white' or 'black'
 let whiteSocket: Socket | null = null;
 let blackSocket: Socket | null = null;
@@ -169,16 +149,7 @@ io.on("connection", (socket) => {
             return;
         }
 
-        board = [
-            ["r", "n", "b", "q", "k", "b", "n", "r"],
-            ["p", "p", "p", "p", "p", "p", "p", "p"],
-            ["", "", "", "", "", "", "", ""],
-            ["", "", "", "", "", "", "", ""],
-            ["", "", "", "", "", "", "", ""],
-            ["", "", "", "", "", "", "", ""],
-            ["P", "P", "P", "P", "P", "P", "P", "P"],
-            ["R", "N", "B", "Q", "K", "B", "N", "R"],
-        ];
+        board = initializeBoard();
         currentTurn = "white";
         moveHistory = [];
         isGameOver = false;
