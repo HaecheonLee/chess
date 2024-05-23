@@ -4,8 +4,7 @@
     "description": "A two-player chess game built with vanilla JavaScript and Node.js.",
     "main": "dist/server/server.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "vite build && tsc",
+        "build": "vite build --config ./src/client/vite.config.ts && tsc --project ./src/tsconfig.json",
         "start": "npm run build && node dist/server/server.js"
     },
     "dependencies": {

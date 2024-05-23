@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "outDir": "../dist",
+        "rootDir": "./",
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "include": ["./**/*"],
+    "exclude": ["./client/**/*"]
+}

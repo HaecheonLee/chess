@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "rootDir": "../",
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "noEmit": true
+    },
+    "include": ["./*", "../common/**/*"]
+}
