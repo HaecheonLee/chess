@@ -9,13 +9,13 @@ import {
 } from "../types/types";
 
 let lastMove: IMovePiece | null = null;
-let movedPieces: Record<string, boolean> = {};
+const movedPieces: Record<string, boolean> = {};
 
 function validateMove(
     board: Board,
     from: ISquare,
     to: ISquare,
-    promotion: PromotionPiece | null = null
+    promotion: PromotionPiece | null = null,
 ) {
     const piece = board[from.row][from.col];
     if (!piece) return false;
@@ -59,7 +59,7 @@ function validateCastling(
     board: Board,
     from: ISquare,
     to: ISquare,
-    kingColor: PieceColor
+    kingColor: PieceColor,
 ) {
     const row = from.row;
     const kingStartCol = 4;
@@ -196,7 +196,7 @@ function validatePawnMove(
     to: ISquare,
     piece: Piece,
     targetPiece: BoardPiece,
-    promotion: PromotionPiece | null
+    promotion: PromotionPiece | null,
 ) {
     const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const targetPieceColor = targetPiece
@@ -252,13 +252,7 @@ function validatePawnMove(
     return false;
 }
 
-function validateRookMove(
-    board: Board,
-    from: ISquare,
-    to: ISquare,
-    piece: Piece,
-    targetPiece: BoardPiece
-) {
+function validateRookMove(board: Board, from: ISquare, to: ISquare) {
     if (from.row !== to.row && from.col !== to.col) return false;
     if (from.row === to.row) {
         const direction = from.col < to.col ? 1 : -1;
@@ -274,25 +268,13 @@ function validateRookMove(
     return true;
 }
 
-function validateKnightMove(
-    board: Board,
-    from: ISquare,
-    to: ISquare,
-    piece: Piece,
-    targetPiece: BoardPiece
-) {
+function validateKnightMove(from: ISquare, to: ISquare) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
 }
 
-function validateBishopMove(
-    board: Board,
-    from: ISquare,
-    to: ISquare,
-    piece: Piece,
-    targetPiece: BoardPiece
-) {
+function validateBishopMove(board: Board, from: ISquare, to: ISquare) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     if (rowDiff !== colDiff) return false;
@@ -305,26 +287,13 @@ function validateBishopMove(
     return true;
 }
 
-function validateQueenMove(
-    board: Board,
-    from: ISquare,
-    to: ISquare,
-    piece: Piece,
-    targetPiece: BoardPiece
-) {
+function validateQueenMove(board: Board, from: ISquare, to: ISquare) {
     return (
-        validateRookMove(board, from, to, piece, targetPiece) ||
-        validateBishopMove(board, from, to, piece, targetPiece)
+        validateRookMove(board, from, to) || validateBishopMove(board, from, to)
     );
 }
 
-function validateKingMove(
-    board: Board,
-    from: ISquare,
-    to: ISquare,
-    piece: Piece,
-    targetPiece: BoardPiece
-) {
+function validateKingMove(from: ISquare, to: ISquare) {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     return rowDiff <= 1 && colDiff <= 1;
@@ -335,11 +304,11 @@ function applyMove(
     from: ISquare,
     to: ISquare,
     piece: Piece,
-    promotion: PromotionPiece | null = null
+    promotion: PromotionPiece | null = null,
 ) {
     const pieceColor = piece === piece.toUpperCase() ? "white" : "black";
     const newBoard = board.map((row) => row.slice());
-    let x = newBoard[0][0];
+
     // Handle promotion
     if (promotion) {
         newBoard[to.row][to.col] =
@@ -413,7 +382,7 @@ function clearsCheck(
     board: Board,
     from: ISquare,
     to: ISquare,
-    kingColor: PieceColor
+    kingColor: PieceColor,
 ) {
     const newBoard = JSON.parse(JSON.stringify(board));
     newBoard[to.row][to.col] = newBoard[from.row][from.col];
@@ -426,7 +395,7 @@ function canMove(
     board: Board,
     from: ISquare,
     to: ISquare,
-    promotion: PromotionPiece | null = null
+    promotion: PromotionPiece | null = null,
 ) {
     const piece = board[from.row][from.col];
     const targetPiece = board[to.row][to.col];
@@ -444,18 +413,18 @@ function canMove(
                 to,
                 piece,
                 targetPiece,
-                promotion
+                promotion,
             );
         case "r": // Rook
-            return validateRookMove(board, from, to, piece, targetPiece);
+            return validateRookMove(board, from, to);
         case "n": // Knight
-            return validateKnightMove(board, from, to, piece, targetPiece);
+            return validateKnightMove(from, to);
         case "b": // Bishop
-            return validateBishopMove(board, from, to, piece, targetPiece);
+            return validateBishopMove(board, from, to);
         case "q": // Queen
-            return validateQueenMove(board, from, to, piece, targetPiece);
+            return validateQueenMove(board, from, to);
         case "k": // King
-            return validateKingMove(board, from, to, piece, targetPiece);
+            return validateKingMove(from, to);
         default:
             return false;
     }

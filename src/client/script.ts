@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             highlightSquares(
                 latestMoveHistory.from,
                 latestMoveHistory.to,
-                null
+                null,
             );
         }
     }
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const square = getSquareElement(move);
                 if (square) {
                     square.classList.add(
-                        square.hasChildNodes() ? "corners" : "pointer"
+                        square.hasChildNodes() ? "corners" : "pointer",
                     );
                 }
             });
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function highlightSquares(
         from: ISquare,
         to: ISquare,
-        kingPosition: ISquare | null
+        kingPosition: ISquare | null,
     ) {
         const squares = [
             {
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return document.querySelector(
-            `.square[data-row='${position.row}'][data-col='${position.col}']`
+            `.square[data-row='${position.row}'][data-col='${position.col}']`,
         );
     }
 
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * @returns {target is HTMLElement} - Returns true if the target is an HTMLElement, otherwise false.
      */
     function checkEventTarget(
-        target: EventTarget | null
+        target: EventTarget | null,
     ): target is HTMLElement {
         return target instanceof HTMLElement;
     }
@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * @returns {dataset is DOMStringMap & ISquareString} - Returns true if the dataset contains the properties of ISquareString, otherwise false.
      */
     function checkDataset(
-        dataset: DOMStringMap
+        dataset: DOMStringMap,
     ): dataset is DOMStringMap & ISquareString {
         return (
             Object.prototype.hasOwnProperty.call(dataset, "row") &&

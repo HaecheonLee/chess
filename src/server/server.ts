@@ -1,4 +1,4 @@
-import { Board, IMoveHistory, PieceColor, Piece } from "../types/types";
+import { Board, IMoveHistory, PieceColor } from "../types/types";
 import { initializeBoard, initializePieces } from "../common/initialState";
 
 import { Server, Socket } from "socket.io";
@@ -85,12 +85,12 @@ io.on("connection", (socket) => {
                 from,
                 to,
                 piece,
-                promotion
+                promotion,
             );
             board = newBoard;
             currentTurn = currentTurn === "white" ? "black" : "white"; // Switch turns
             const moveNotation = `${pieces[piece]}${String.fromCharCode(
-                97 + from.col
+                97 + from.col,
             )}${8 - from.row}-${String.fromCharCode(97 + to.col)}${8 - to.row}`;
             moveHistory.push({ moveNotation, from, to });
 
